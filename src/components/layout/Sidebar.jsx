@@ -15,11 +15,11 @@ const Sidebar = () => {
           Add Product
         </Link>
 
-        <Link to="/admin/add-bundle" className="hover:text-white">
+        <Link to="/add-bundle-products" className="hover:text-white">
           Add Bundle Product
         </Link>
 
-        <Link to="/admin/customers" className="hover:text-white">
+        <Link to="/users" className="hover:text-white">
           Customers
         </Link>
 
