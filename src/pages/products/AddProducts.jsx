@@ -84,7 +84,7 @@ const AddProduct = () => {
 
         {/* Submit Button */}
         <div>
-          <button className="bg-(--primary-color) text-white px-7 py-3 rounded-lg text-lg hover:bg-gray-900 transition">
+          <button className="bg-(--primary-color) text-whpx-7 py-3 rounded-lg text-lg hover:bg-gray-900 transition">
             Add Product
           </button>
         </div>
