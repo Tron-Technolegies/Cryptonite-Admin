@@ -1,33 +1,52 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
-const Sidebar = () => {
+const Sidebar = ({ open, setOpen }) => {
+  const base = "flex items-center px-4 py-3 rounded-lg transition-all";
+
   return (
-    <aside className="w-56 bg-black text-white h-screen p-5 fixed left-0 top-0">
-      <h2 className="text-xl font-bold mb-8">Admin Panel</h2>
+    <>
+      {/* Overlay */}
+      {open && (
+        <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setOpen(false)} />
+      )}
 
-      <nav className="flex flex-col gap-4 text-gray-200">
-        <Link to="" className="hover:text-white">
-          Dashboard
-        </Link>
+      <aside
+        className={`fixed md:static top-0 left-0 h-screen w-56 bg-black text-white transform
+  ${open ? "translate-x-0" : "-translate-x-full"}
+  md:translate-x-0
+  z-50 md:z-auto
+  transition-transform`}
+      >
+        <div className="px-5 py-6 border-b border-gray-800">
+          <h2 className="text-xl font-bold">Admin Panel</h2>
+        </div>
 
-        <Link to="/add-product" className="hover:text-white">
-          Add Product
-        </Link>
-
-        <Link to="/add-bundle-products" className="hover:text-white">
-          Add Bundle Product
-        </Link>
-
-        <Link to="/users" className="hover:text-white">
-          Customers
-        </Link>
-
-        <Link to="/admin/orders" className="hover:text-white">
-          Orders
-        </Link>
-      </nav>
-    </aside>
+        <nav className="px-3 py-6 space-y-2">
+          {[
+            { to: "/", label: "Dashboard", end: true },
+            { to: "/products", label: "Products" },
+            { to: "/users", label: "Users" },
+          ].map(({ to, label, end }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              onClick={() => setOpen(false)}
+              className={({ isActive }) =>
+                `${base} ${
+                  isActive
+                    ? "bg-[var(--primary-color)] text-white"
+                    : "text-gray-300 hover:bg-[var(--primary-color-soft)]"
+                }`
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+      </aside>
+    </>
   );
 };
 

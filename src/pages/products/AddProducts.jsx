@@ -1,96 +1,130 @@
-import React from "react";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import api from "../../api/api";
 
-const AddProduct = () => {
+const AddProduct = ({ onSuccess }) => {
+  const [formData, setFormData] = useState({
+    model_name: "",
+    minable_coins: "",
+    hashrate: "",
+    power: "",
+    algorithm: "",
+    price: "",
+    stock: "",
+  });
+
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImage = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImage(file);
+    setPreview(URL.createObjectURL(file));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!Object.values(formData).every(Boolean) || !image) {
+      return toast.error("All fields are required");
+    }
+
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, value]) => data.append(key, value));
+    data.append("image", image);
+
+    try {
+      setLoading(true);
+      await api.post("/products/add/", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success("Product added successfully");
+      onSuccess?.();
+    } catch (error) {
+      toast.error("Failed to add product");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="max-w-4xl">
+    <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border space-y-5">
+      <h2 className="text-2xl font-bold">Add Mining Product</h2>
 
-      {/* Page Title */}
-      <h2 className="text-3xl font-bold mb-8">Add New Product</h2>
+      <input
+        name="model_name"
+        placeholder="Model Name"
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg"
+      />
 
-      {/* Card */}
-      <div className="bg-white shadow-md p-8 rounded-xl border space-y-7">
+      <input
+        name="minable_coins"
+        placeholder="Minable Coins (BTC, ETH)"
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg"
+      />
 
-        {/* Product Name */}
-        <div className="space-y-2">
-          <label className="text-gray-600 font-medium">Product Name</label>
-          <input
-            type="text"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-            placeholder="Enter product name"
-          />
-        </div>
+      <input
+        name="hashrate"
+        placeholder="Hashrate (e.g. 110 TH/s)"
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg"
+      />
 
-        {/* Price & Stock */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          <div className="space-y-2">
-            <label className="text-gray-600 font-medium">Price (₹)</label>
-            <input
-              type="number"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="Enter price"
-            />
-          </div>
+      <input
+        name="power"
+        placeholder="Power Consumption (W)"
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg"
+      />
 
-          <div className="space-y-2">
-            <label className="text-gray-600 font-medium">Stock</label>
-            <input
-              type="number"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="Enter quantity"
-            />
-          </div>
+      <input
+        name="algorithm"
+        placeholder="Algorithm (SHA-256)"
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg"
+      />
 
-        </div>
-
-        {/* Category */}
-        <div className="space-y-2">
-          <label className="text-gray-600 font-medium">Category</label>
-          <select className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
-            <option>Select a category</option>
-            <option>Mining Machine</option>
-            <option>GPU</option>
-            <option>Accessories</option>
-            <option>Bundle</option>
-          </select>
-        </div>
-
-        {/* Description */}
-        <div className="space-y-2">
-          <label className="text-gray-600 font-medium">Description</label>
-          <textarea
-            rows="5"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-            placeholder="Enter product description"
-          ></textarea>
-        </div>
-
-        {/* Image Upload */}
-        <div className="space-y-2">
-          <label className="text-gray-600 font-medium">Product Image</label>
-          
-          <div className="border rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition cursor-pointer">
-            <input
-              type="file"
-              className="w-full text-gray-600"
-            />
-          </div>
-
-          {/* Optional Preview Box */}
-          <div className="h-40 w-40 border rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
-            Image Preview
-          </div>
-        </div>
-
-        {/* Submit Button */}
-        <div>
-          <button className="bg-(--primary-color) text-whpx-7 py-3 rounded-lg text-lg hover:bg-gray-900 transition">
-            Add Product
-          </button>
-        </div>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input
+          name="price"
+          type="number"
+          placeholder="Price (₹)"
+          onChange={handleChange}
+          className="w-full p-3 border rounded-lg"
+        />
+        <input
+          name="stock"
+          type="number"
+          placeholder="Stock"
+          onChange={handleChange}
+          className="w-full p-3 border rounded-lg"
+        />
       </div>
-    </div>
+
+      {/* Image Upload */}
+      <input type="file" onChange={handleImage} />
+
+      {/* Preview */}
+      {preview && (
+        <img src={preview} alt="Preview" className="h-32 w-32 object-cover rounded border" />
+      )}
+
+      <button
+        disabled={loading}
+        className="px-6 py-3 text-black rounded-lg"
+        style={{ backgroundColor: "var(--primary-color)" }}
+      >
+        {loading ? "Saving..." : "Save Product"}
+      </button>
+    </form>
   );
 };
 

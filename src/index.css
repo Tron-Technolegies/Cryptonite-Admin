@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
-:root{
-    --primary-color : #00c336;
+:root {
+  --primary-color: #00c336;
+  --primary-color-soft: #19d94d;
+}
+
+.Toastify__toast-container {
+  z-index: 999999 !important;
 }
