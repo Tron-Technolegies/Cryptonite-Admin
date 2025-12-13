@@ -14,71 +14,28 @@ import Paper from "@mui/material/Paper";
 
 // Icons
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import AddProduct from "../../pages/products/AddProducts";
 
+// Modal
 export default function ProductTable() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Pagination (same style as AgreementTable)
   const [page, setPage] = useState(1);
   const itemsPerPage = 5;
 
+  const [showForm, setShowForm] = useState(false);
+  const [editProduct, setEditProduct] = useState(null);
+
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
-  const sampleProducts = [
-    {
-      id: 1,
-      name: "ASIC Miner S19 Pro",
-      price: 125000,
-      stock: 10,
-      category: "Mining Hardware",
-    },
-    {
-      id: 2,
-      name: "WhatsMiner M30S++",
-      price: 138000,
-      stock: 7,
-      category: "Mining Hardware",
-    },
-    {
-      id: 3,
-      name: "Mining Power Supply 3200W",
-      price: 18000,
-      stock: 25,
-      category: "Accessories",
-    },
-    {
-      id: 4,
-      name: "Immersion Cooling Tank",
-      price: 85000,
-      stock: 3,
-      category: "Cooling",
-    },
-    {
-      id: 5,
-      name: "Antminer Control Board",
-      price: 9500,
-      stock: 40,
-      category: "Spare Parts",
-    },
-  ];
-
-  // Fetch products
   const fetchProducts = async () => {
     try {
       setIsLoading(true);
       const res = await api.get("products/");
-
-      // ✅ Use API data if available, else fallback to samples
-      if (res.data && res.data.length > 0) {
-        setProducts(res.data);
-      } else {
-        setProducts(sampleProducts);
-      }
-    } catch (error) {
-      // ✅ On error also show samples
-      setProducts(sampleProducts);
-      toast.error("Failed to load products (showing sample data)");
+      setProducts(res.data);
+    } catch {
+      toast.error("Failed to load products");
     } finally {
       setIsLoading(false);
     }
@@ -88,40 +45,53 @@ export default function ProductTable() {
     fetchProducts();
   }, []);
 
-  if (isLoading) return <Loading />;
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this product?")) return;
+
+    try {
+      await api.delete(`products/${id}/delete/`);
+      toast.success("Product deleted");
+      fetchProducts();
+    } catch {
+      toast.error("Failed to delete product");
+    }
+  };
 
   const paginatedProducts = products.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
+  if (isLoading) return <Loading />;
+
   return (
     <div className="bg-[#F5F5F5] rounded-lg p-4 mt-6 max-w-[90vw]">
-      <h2 className="text-lg font-semibold mb-2">Products</h2>
-      <p className="text-sm text-gray-600 mb-3">Manage all available products and their details.</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-lg font-semibold">Products</h2>
+          <p className="text-sm text-gray-600">Manage all available products</p>
+        </div>
+      </div>
 
       {/* TABLE */}
-      <TableContainer
-        component={Paper}
-        sx={{
-          marginTop: 3,
-          overflowX: "auto",
-        }}
-      >
-        <Table sx={{ minWidth: 750 }}>
+      <TableContainer component={Paper} sx={{ marginTop: 3, overflowX: "auto" }}>
+        <Table sx={{ minWidth: 900 }}>
           <TableHead>
             <TableRow sx={{ backgroundColor: "#F9FAFB" }}>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Name
+              <TableCell align="center">
+                <b>Name</b>
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Price
+              <TableCell align="center">
+                <b>Price</b>
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Stock
+              <TableCell align="center">
+                <b>Hashrate</b>
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Category
+              <TableCell align="center">
+                <b>Power</b>
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Actions
+              <TableCell align="center">
+                <b>Algorithm</b>
+              </TableCell>
+              <TableCell align="center">
+                <b>Actions</b>
               </TableCell>
             </TableRow>
           </TableHead>
@@ -129,21 +99,33 @@ export default function ProductTable() {
           <TableBody sx={{ background: "#eff6ff" }}>
             {paginatedProducts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} align="center">
+                <TableCell colSpan={6} align="center">
                   No products found
                 </TableCell>
               </TableRow>
             ) : (
               paginatedProducts.map((product) => (
                 <TableRow key={product.id}>
-                  <TableCell align="center">{product.name}</TableCell>
-                  <TableCell align="center">₹{product.price}</TableCell>
-                  <TableCell align="center">{product.stock}</TableCell>
-                  <TableCell align="center">{product.category}</TableCell>
+                  <TableCell align="center">{product.model_name}</TableCell>
+                  <TableCell align="center">₹{product.price || "-"}</TableCell>
+                  <TableCell align="center">{product.hashrate}</TableCell>
+                  <TableCell align="center">{product.power}</TableCell>
+                  <TableCell align="center">{product.algorithm}</TableCell>
                   <TableCell align="center">
                     <div className="flex justify-center gap-3">
-                      <FiEdit2 className="cursor-pointer hover:text-blue-500" size={18} />
-                      <FiTrash2 className="cursor-pointer hover:text-red-500" size={18} />
+                      <FiEdit2
+                        size={18}
+                        className="cursor-pointer hover:text-blue-500"
+                        onClick={() => {
+                          setEditProduct(product);
+                          setShowForm(true);
+                        }}
+                      />
+                      <FiTrash2
+                        size={18}
+                        className="cursor-pointer hover:text-red-500"
+                        onClick={() => handleDelete(product.id)}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -175,6 +157,22 @@ export default function ProductTable() {
           Next
         </button>
       </div>
+
+      {/* MODAL */}
+      {showForm && (
+        <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-xl w-full max-w-xl">
+            <AddProduct
+              editData={editProduct}
+              onSuccess={() => {
+                setShowForm(false);
+                fetchProducts();
+              }}
+              onClose={() => setShowForm(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

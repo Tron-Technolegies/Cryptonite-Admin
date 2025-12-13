@@ -9,6 +9,8 @@ import LoginPage from "../pages/login/LoginPage";
 import Errorpage from "../pages/Errorpage";
 import ProtectedRoute from "./ProtectedRoutes";
 import AddProduct from "../pages/products/AddProducts";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const router = createBrowserRouter([
   {
@@ -31,5 +33,10 @@ const router = createBrowserRouter([
 ]);
 
 export default function AppRoutes() {
-  return <RouterProvider router={router} />;
+  return (
+    <div>
+      <ToastContainer position="top-right" autoClose={2000} theme="colored" />
+      <RouterProvider router={router} />
+    </div>
+  );
 }
