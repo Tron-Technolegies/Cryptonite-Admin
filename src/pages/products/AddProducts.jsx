@@ -1,21 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../api/api";
 
-const AddProduct = ({ onSuccess }) => {
+const AddProduct = ({ onSuccess, onClose, editData }) => {
+  const isEdit = Boolean(editData);
+
   const [formData, setFormData] = useState({
     model_name: "",
+    description: "",
+    product_details: "",
     minable_coins: "",
     hashrate: "",
     power: "",
     algorithm: "",
     price: "",
-    stock: "",
+    hosting_fee_per_kw: "",
   });
 
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // ✅ Prefill data on edit
+  useEffect(() => {
+    if (editData) {
+      setFormData({
+        model_name: editData.model_name || "",
+        description: editData.description || "",
+        product_details: editData.product_details || "",
+        minable_coins: editData.minable_coins || "",
+        hashrate: editData.hashrate || "",
+        power: editData.power || "",
+        algorithm: editData.algorithm || "",
+        price: editData.price || "",
+        hosting_fee_per_kw: editData.hosting_fee_per_kw || "",
+      });
+
+      if (editData.image) {
+        setPreview(editData.image);
+      }
+    }
+  }, [editData]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,23 +56,49 @@ const AddProduct = ({ onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!Object.values(formData).every(Boolean) || !image) {
-      return toast.error("All fields are required");
+    const requiredFields = [
+      "model_name",
+      "description",
+      "minable_coins",
+      "hashrate",
+      "power",
+      "algorithm",
+    ];
+
+    for (let field of requiredFields) {
+      if (!formData[field]) {
+        return toast.error("Please fill all required fields");
+      }
     }
 
     const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => data.append(key, value));
-    data.append("image", image);
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value !== "") data.append(key, value);
+    });
+
+    if (image) data.append("image", image);
 
     try {
       setLoading(true);
-      await api.post("/products/add/", data, {
-        headers: { "Content-Type": "multipart/form-data" },
+
+      const url = isEdit ? `/products/${editData.id}/update/` : "/products/add/";
+
+      const method = isEdit ? "patch" : "post";
+
+      await api({
+        method,
+        url,
+        data,
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("access")}`,
+        },
       });
-      toast.success("Product added successfully");
+
+      toast.success(isEdit ? "Product updated successfully" : "Product added successfully");
       onSuccess?.();
     } catch (error) {
-      toast.error("Failed to add product");
+      toast.error("Failed to save product");
     } finally {
       setLoading(false);
     }
@@ -55,40 +106,72 @@ const AddProduct = ({ onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border space-y-5">
-      <h2 className="text-2xl font-bold">Add Mining Product</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">
+          {isEdit ? "Edit Mining Product" : "Add Mining Product"}
+        </h2>
+        {onClose && (
+          <button type="button" onClick={onClose} className="text-gray-500">
+            ✕
+          </button>
+        )}
+      </div>
 
+      {/* REQUIRED */}
       <input
         name="model_name"
-        placeholder="Model Name"
+        value={formData.model_name}
         onChange={handleChange}
+        placeholder="Model Name *"
+        className="w-full p-3 border rounded-lg"
+      />
+
+      <textarea
+        name="description"
+        value={formData.description}
+        onChange={handleChange}
+        placeholder="Description *"
         className="w-full p-3 border rounded-lg"
       />
 
       <input
         name="minable_coins"
-        placeholder="Minable Coins (BTC, ETH)"
+        value={formData.minable_coins}
         onChange={handleChange}
+        placeholder="Minable Coins (BTC, BCH) *"
         className="w-full p-3 border rounded-lg"
       />
 
       <input
         name="hashrate"
-        placeholder="Hashrate (e.g. 110 TH/s)"
+        value={formData.hashrate}
         onChange={handleChange}
+        placeholder="Hashrate (e.g. 110 TH/s) *"
         className="w-full p-3 border rounded-lg"
       />
 
       <input
         name="power"
-        placeholder="Power Consumption (W)"
+        value={formData.power}
         onChange={handleChange}
+        placeholder="Power Consumption (W) *"
         className="w-full p-3 border rounded-lg"
       />
 
       <input
         name="algorithm"
-        placeholder="Algorithm (SHA-256)"
+        value={formData.algorithm}
         onChange={handleChange}
+        placeholder="Algorithm (SHA-256) *"
+        className="w-full p-3 border rounded-lg"
+      />
+
+      {/* OPTIONAL */}
+      <textarea
+        name="product_details"
+        value={formData.product_details}
+        onChange={handleChange}
+        placeholder="Product Details (optional)"
         className="w-full p-3 border rounded-lg"
       />
 
@@ -96,23 +179,25 @@ const AddProduct = ({ onSuccess }) => {
         <input
           name="price"
           type="number"
-          placeholder="Price (₹)"
+          value={formData.price}
           onChange={handleChange}
+          placeholder="Price (optional)"
           className="w-full p-3 border rounded-lg"
         />
+
         <input
-          name="stock"
+          name="hosting_fee_per_kw"
           type="number"
-          placeholder="Stock"
+          value={formData.hosting_fee_per_kw}
           onChange={handleChange}
+          placeholder="Hosting Fee per kW (optional)"
           className="w-full p-3 border rounded-lg"
         />
       </div>
 
-      {/* Image Upload */}
-      <input type="file" onChange={handleImage} />
+      {/* IMAGE */}
+      <input type="file" accept="image/*" onChange={handleImage} />
 
-      {/* Preview */}
       {preview && (
         <img src={preview} alt="Preview" className="h-32 w-32 object-cover rounded border" />
       )}
@@ -122,7 +207,7 @@ const AddProduct = ({ onSuccess }) => {
         className="px-6 py-3 text-black rounded-lg"
         style={{ backgroundColor: "var(--primary-color)" }}
       >
-        {loading ? "Saving..." : "Save Product"}
+        {loading ? "Saving..." : isEdit ? "Update Product" : "Save Product"}
       </button>
     </form>
   );

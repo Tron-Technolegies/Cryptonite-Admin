@@ -12,7 +12,7 @@ const Sidebar = ({ open, setOpen }) => {
       )}
 
       <aside
-        className={`fixed md:static top-0 left-0 h-screen w-56 bg-black text-white transform
+        className={`fixed md:static top-0 left-0 min-h-screen w-56 bg-black text-white transform
   ${open ? "translate-x-0" : "-translate-x-full"}
   md:translate-x-0
   z-50 md:z-auto

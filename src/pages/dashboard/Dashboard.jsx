@@ -1,46 +1,74 @@
 import React from "react";
+import { FiBox, FiUsers, FiShoppingCart, FiTrendingUp } from "react-icons/fi";
 
 const Dashboard = () => {
+  const stats = [
+    {
+      title: "Total Products",
+      value: 128,
+      icon: <FiBox size={26} />,
+    },
+    {
+      title: "Total Customers",
+      value: 542,
+      icon: <FiUsers size={26} />,
+    },
+    {
+      title: "Total Orders",
+      value: 89,
+      icon: <FiShoppingCart size={26} />,
+    },
+    {
+      title: "Monthly Revenue",
+      value: "₹4,25,000",
+      icon: <FiTrendingUp size={26} />,
+    },
+  ];
+
   return (
-    <div>
-
+    <div className="space-y-6">
       {/* Title */}
-      <h2 className="text-3xl font-bold mb-6">Dashboard</h2>
-
-      {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-
-        {/* Total Products */}
-        <div className="bg-white shadow-sm p-6 rounded-lg border">
-          <h3 className="text-gray-600 text-sm font-medium">Total Products</h3>
-          <p className="text-4xl font-bold mt-2 text-black">0</p>
-        </div>
-
-        {/* Total Customers */}
-        <div className="bg-white shadow-sm p-6 rounded-lg border">
-          <h3 className="text-gray-600 text-sm font-medium">Total Customers</h3>
-          <p className="text-4xl font-bold mt-2 text-black">0</p>
-        </div>
-
-        {/* Total Orders */}
-        <div className="bg-white shadow-sm p-6 rounded-lg border">
-          <h3 className="text-gray-600 text-sm font-medium">Total Orders</h3>
-          <p className="text-4xl font-bold mt-2 text-black">0</p>
-        </div>
+      <div>
+        <h2 className="text-3xl font-bold">Dashboard</h2>
+        <p className="text-gray-500 mt-1">Overview of your mining store performance</p>
       </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white shadow-sm p-6 rounded-lg border">
-        <h3 className="text-xl font-semibold mb-4">Recent Activities</h3>
+      {/* WRAPPER CARD */}
+      <div className="bg-white rounded-xl shadow-md p-6">
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((item, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-xl shadow-sm hover:shadow-lg transition p-6 flex items-center justify-between"
+            >
+              <div>
+                <h3 className="text-sm text-gray-500">{item.title}</h3>
+                <p className="text-3xl font-bold mt-1" style={{ color: "var(--primary-color)" }}>
+                  {item.value}
+                </p>
+              </div>
 
-        <ul className="space-y-3">
-          <li className="text-gray-700">• New customer registered</li>
-          <li className="text-gray-700">• 1 new product added</li>
-          <li className="text-gray-700">• Order #1023 placed</li>
-          <li className="text-gray-700">• Bundle offer updated</li>
-        </ul>
+              <div
+                className="p-3 rounded-full text-white"
+                style={{ backgroundColor: "var(--primary-color)" }}
+              >
+                {item.icon}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Dummy Content */}
+        {/* <div className="mt-8 bg-gray-50 rounded-xl p-6">
+          <h3 className="text-lg font-semibold mb-2">System Summary</h3>
+          <p className="text-gray-600 text-sm leading-relaxed">
+            This dashboard gives you a quick overview of your mining products, customers, and
+            orders. Future updates can include analytics charts, performance tracking, and real-time
+            system insights.
+          </p>
+        </div> */}
       </div>
-
     </div>
   );
 };
