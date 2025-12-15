@@ -21,7 +21,6 @@ const AddProduct = ({ onSuccess, onClose, editData }) => {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Prefill data on edit
   useEffect(() => {
     if (editData) {
       setFormData({
@@ -105,7 +104,7 @@ const AddProduct = ({ onSuccess, onClose, editData }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl border space-y-5">
+    <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-xl  space-y-5">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">
           {isEdit ? "Edit Mining Product" : "Add Mining Product"}
@@ -123,7 +122,7 @@ const AddProduct = ({ onSuccess, onClose, editData }) => {
         value={formData.model_name}
         onChange={handleChange}
         placeholder="Model Name *"
-        className="w-full p-3 border rounded-lg"
+        className="w-full p-3 border-[#56d083] bg-white border rounded-lg"
       />
 
       <textarea
@@ -204,7 +203,7 @@ const AddProduct = ({ onSuccess, onClose, editData }) => {
 
       <button
         disabled={loading}
-        className="px-6 py-3 text-black rounded-lg"
+        className="px-6 py-3 text-white rounded-lg"
         style={{ backgroundColor: "var(--primary-color)" }}
       >
         {loading ? "Saving..." : isEdit ? "Update Product" : "Save Product"}

@@ -3,7 +3,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "../pages/Layout";
 import Dashboard from "../pages/dashboard/Dashboard";
 import Product from "../pages/products/Product";
-import AddBundleProduct from "../pages/bundles/AddBundleProduct";
 import Users from "../pages/users/Users";
 import LoginPage from "../pages/login/LoginPage";
 import Errorpage from "../pages/Errorpage";
@@ -11,6 +10,11 @@ import ProtectedRoute from "./ProtectedRoutes";
 import AddProduct from "../pages/products/AddProducts";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BundlePage from "../pages/bundles/BundlePage";
+import RentalPage from "../pages/rentals/RentalPage";
+import HostingRequests from "../pages/hosting/HostingRequests";
+import OrderPage from "../pages/orders/OrderPage";
+import BundleForm from "../pages/bundles/BundleForm";
 
 const router = createBrowserRouter([
   {
@@ -25,8 +29,13 @@ const router = createBrowserRouter([
       { index: true, element: <Dashboard /> },
       { path: "products", element: <Product /> },
       { path: "products-add", element: <AddProduct /> },
-      { path: "add-bundle-products", element: <AddBundleProduct /> },
       { path: "users", element: <Users /> },
+      { path: "bundles", element: <BundlePage /> },
+      { path: "bundles/add", element: <BundleForm /> },
+      { path: "bundles/edit/:id", element: <BundleForm /> },
+      { path: "rentals", element: <RentalPage /> },
+      { path: "hosting-requests", element: <HostingRequests /> },
+      { path: "orders", element: <OrderPage /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },

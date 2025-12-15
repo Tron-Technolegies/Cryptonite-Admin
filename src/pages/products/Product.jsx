@@ -14,7 +14,7 @@ export default function Product() {
 
           <button
             onClick={() => navigate("/products-add")}
-            className="text-black px-6 py-2 rounded-lg font-medium transition"
+            className="text-white px-6 py-2 rounded-lg font-medium transition"
             style={{ backgroundColor: "var(--primary-color)" }}
           >
             Add New Product
@@ -22,7 +22,7 @@ export default function Product() {
         </div>
 
         {/* PRODUCT TABLE */}
-        <div className="bg-white rounded-xl border shadow-sm p-4">
+        <div className="bg-white rounded-xl shadow-sm p-4">
           <ProductTable />
         </div>
       </div>
