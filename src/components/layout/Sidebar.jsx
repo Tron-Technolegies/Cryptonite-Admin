@@ -27,6 +27,10 @@ const Sidebar = ({ open, setOpen }) => {
             { to: "/", label: "Dashboard", end: true },
             { to: "/products", label: "Products" },
             { to: "/users", label: "Users" },
+            { to: "/bundles", label: "Bundles" },
+            { to: "/rentals", label: "Rentals" },
+            { to: "/hosting-requests", label: "Hosting Requests" },
+            { to: "/orders", label: "Orders" },
           ].map(({ to, label, end }) => (
             <NavLink
               key={to}
@@ -36,8 +40,8 @@ const Sidebar = ({ open, setOpen }) => {
               className={({ isActive }) =>
                 `${base} ${
                   isActive
-                    ? "bg-[var(--primary-color)] text-white"
-                    : "text-gray-300 hover:bg-[var(--primary-color-soft)]"
+                    ? "bg-[var(--primary-color)] text-white font-semibold"
+                    : "text-white font-semibold hover:bg-[var(--primary-color-soft)]"
                 }`
               }
             >

@@ -65,7 +65,7 @@ export default function ProductTable() {
     <div className="bg-[#F5F5F5] rounded-lg p-4 mt-6 max-w-[90vw]">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-lg font-semibold">Products</h2>
+          <h2 className="text-lg font-semibold">Products List</h2>
           <p className="text-sm text-gray-600">Manage all available products</p>
         </div>
       </div>
@@ -106,8 +106,19 @@ export default function ProductTable() {
             ) : (
               paginatedProducts.map((product) => (
                 <TableRow key={product.id}>
-                  <TableCell align="center">{product.model_name}</TableCell>
-                  <TableCell align="center">₹{product.price || "-"}</TableCell>
+                  <TableCell align="center">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="h-10 w-10 rounded-md object-cover border"
+                      />
+                      <div>
+                        <p className="font-medium">{product.model_name}</p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell align="center">{product.price || "-"}</TableCell>
                   <TableCell align="center">{product.hashrate}</TableCell>
                   <TableCell align="center">{product.power}</TableCell>
                   <TableCell align="center">{product.algorithm}</TableCell>
