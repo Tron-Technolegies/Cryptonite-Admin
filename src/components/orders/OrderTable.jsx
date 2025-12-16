@@ -12,9 +12,12 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
+const STATUS_OPTIONS = ["completed", "shipped", "cancelled"];
+
 export default function OrderTable() {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [updatingId, setUpdatingId] = useState(null);
 
   const fetchOrders = async () => {
     try {
@@ -32,6 +35,19 @@ export default function OrderTable() {
     fetchOrders();
   }, []);
 
+  const updateStatus = async (id, status) => {
+    try {
+      setUpdatingId(id);
+      await api.patch(`orders/${id}/status/`, { status });
+      toast.success("Order status updated");
+      fetchOrders();
+    } catch {
+      toast.error("Failed to update status");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   if (isLoading) return <Loading />;
 
   return (
@@ -40,20 +56,26 @@ export default function OrderTable() {
       <p className="text-sm text-gray-600 mb-4">Customer purchase orders</p>
 
       <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
-        <Table sx={{ minWidth: 900 }}>
+        <Table sx={{ minWidth: 1000 }}>
           <TableHead>
             <TableRow sx={{ backgroundColor: "#F9FAFB" }}>
               <TableCell align="center">
                 <b>Order ID</b>
               </TableCell>
               <TableCell align="center">
-                <b>User</b>
+                <b>User Email</b>
               </TableCell>
               <TableCell align="center">
-                <b>Total Amount (₹)</b>
+                <b>Items</b>
               </TableCell>
               <TableCell align="center">
-                <b>Payment Status</b>
+                <b>Total Amount </b>
+              </TableCell>
+              <TableCell align="center">
+                <b>Payment</b>
+              </TableCell>
+              <TableCell align="center">
+                <b>Status</b>
               </TableCell>
               <TableCell align="center">
                 <b>Date</b>
@@ -64,29 +86,41 @@ export default function OrderTable() {
           <TableBody sx={{ background: "#eff6ff" }}>
             {orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} align="center">
+                <TableCell colSpan={6} align="center">
                   No orders found
                 </TableCell>
               </TableRow>
             ) : (
               orders.map((order) => (
                 <TableRow key={order.id} hover>
-                  <TableCell align="center">{order.order_id || order.id}</TableCell>
-                  <TableCell align="center">{order.user?.email || "—"}</TableCell>
+                  <TableCell align="center">#{order.id}</TableCell>
+
+                  <TableCell align="center">{order.user_email}</TableCell>
+
+                  <TableCell align="center">{order.items?.length || 0}</TableCell>
+
                   <TableCell align="center" className="font-semibold">
-                    ₹{order.total_amount}
+                    {order.total_amount}
                   </TableCell>
+
+                  <TableCell align="center">{order.stripe_payment_intent}</TableCell>
+
+                  {/* STATUS (ADMIN CONTROL) */}
                   <TableCell align="center">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        order.payment_status === "paid"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
+                    <select
+                      value={order.status}
+                      disabled={updatingId === order.id}
+                      onChange={(e) => updateStatus(order.id, e.target.value)}
+                      className={`px-3 py-1 rounded-lg text-sm font-medium border focus:outline-none `}
                     >
-                      {order.payment_status}
-                    </span>
+                      {STATUS_OPTIONS.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
                   </TableCell>
+
                   <TableCell align="center">
                     {new Date(order.created_at).toLocaleDateString()}
                   </TableCell>
