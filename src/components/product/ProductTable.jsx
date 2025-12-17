@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../api/api";
 import Loading from "../Loading";
+import { useNavigate } from "react-router-dom";
 
 // MUI
 import Table from "@mui/material/Table";
@@ -14,19 +15,14 @@ import Paper from "@mui/material/Paper";
 
 // Icons
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
-import AddProduct from "../../pages/products/AddProducts";
 
-// Modal
 export default function ProductTable() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const [page, setPage] = useState(1);
   const itemsPerPage = 5;
-
-  const [showForm, setShowForm] = useState(false);
-  const [editProduct, setEditProduct] = useState(null);
-
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
   const fetchProducts = async () => {
@@ -62,15 +58,7 @@ export default function ProductTable() {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="bg-[#F5F5F5] rounded-lg p-4 mt-6 max-w-[90vw]">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-lg font-semibold">Products List</h2>
-          <p className="text-sm text-gray-600">Manage all available products</p>
-        </div>
-      </div>
-
-      {/* TABLE */}
+    <div className="bg-[#F5F5F5] rounded-lg p-4 max-w-[90vw]">
       <TableContainer component={Paper} sx={{ marginTop: 3, overflowX: "auto" }}>
         <Table sx={{ minWidth: 900 }}>
           <TableHead>
@@ -96,7 +84,7 @@ export default function ProductTable() {
             </TableRow>
           </TableHead>
 
-          <TableBody sx={{ background: "#eff6ff" }}>
+          <TableBody>
             {paginatedProducts.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} align="center">
@@ -110,12 +98,10 @@ export default function ProductTable() {
                     <div className="flex items-center gap-3">
                       <img
                         src={product.image}
-                        alt={product.name}
+                        alt={product.model_name}
                         className="h-10 w-10 rounded-md object-cover border"
                       />
-                      <div>
-                        <p className="font-medium">{product.model_name}</p>
-                      </div>
+                      <p className="font-medium">{product.model_name}</p>
                     </div>
                   </TableCell>
                   <TableCell align="center">{product.price || "-"}</TableCell>
@@ -125,15 +111,10 @@ export default function ProductTable() {
                   <TableCell align="center">
                     <div className="flex justify-center gap-3">
                       <FiEdit2
-                        size={18}
                         className="cursor-pointer hover:text-blue-500"
-                        onClick={() => {
-                          setEditProduct(product);
-                          setShowForm(true);
-                        }}
+                        onClick={() => navigate(`/products-edit/${product.id}`)}
                       />
                       <FiTrash2
-                        size={18}
                         className="cursor-pointer hover:text-red-500"
                         onClick={() => handleDelete(product.id)}
                       />
@@ -168,22 +149,6 @@ export default function ProductTable() {
           Next
         </button>
       </div>
-
-      {/* MODAL */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-xl w-full max-w-xl">
-            <AddProduct
-              editData={editProduct}
-              onSuccess={() => {
-                setShowForm(false);
-                fetchProducts();
-              }}
-              onClose={() => setShowForm(false)}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
