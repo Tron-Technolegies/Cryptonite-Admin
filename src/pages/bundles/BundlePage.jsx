@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import BundleTable from "../../components/bundles/BundleTable";
+import { IoAddCircleOutline } from "react-icons/io5";
 
 export default function BundlePage() {
   const navigate = useNavigate();
@@ -13,9 +14,10 @@ export default function BundlePage() {
 
           <button
             onClick={() => navigate("/bundles/add")}
-            className="text-white px-6 py-2 rounded-lg"
+            className="text-white flex items-center gap-2 px-6 py-2 rounded-lg"
             style={{ backgroundColor: "var(--primary-color)" }}
           >
+            <IoAddCircleOutline />
             Add Bundle
           </button>
         </div>

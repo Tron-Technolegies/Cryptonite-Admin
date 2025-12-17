@@ -39,7 +39,6 @@ export default function RentalTable() {
       <h2 className="text-3xl font-bold mb-2">Rentals</h2>
       <p className="text-sm text-gray-600 mb-4">Rental machine transactions</p>
 
-      {/* TABLE */}
       <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
         <Table sx={{ minWidth: 900 }}>
           <TableHead>
@@ -48,13 +47,19 @@ export default function RentalTable() {
                 <b>ID</b>
               </TableCell>
               <TableCell align="center">
-                <b>User</b>
+                <b>User ID</b>
               </TableCell>
               <TableCell align="center">
                 <b>Product</b>
               </TableCell>
               <TableCell align="center">
                 <b>Duration (Days)</b>
+              </TableCell>
+              <TableCell align="center">
+                <b>Start Date</b>
+              </TableCell>
+              <TableCell align="center">
+                <b>End Date</b>
               </TableCell>
               <TableCell align="center">
                 <b>Total Amount (₹)</b>
@@ -68,7 +73,7 @@ export default function RentalTable() {
           <TableBody sx={{ background: "#eff6ff" }}>
             {rentals.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} align="center">
+                <TableCell colSpan={8} align="center">
                   No rentals found
                 </TableCell>
               </TableRow>
@@ -77,13 +82,20 @@ export default function RentalTable() {
                 <TableRow key={rental.id} hover>
                   <TableCell align="center">{rental.id}</TableCell>
 
-                  <TableCell align="center">{rental.user?.email || "—"}</TableCell>
+                  <TableCell align="center">User #{rental.user}</TableCell>
 
-                  <TableCell align="center">{rental.product?.model_name || "—"}</TableCell>
+                  <TableCell align="center">{rental.product_name}</TableCell>
 
                   <TableCell align="center">{rental.duration_days}</TableCell>
 
-                  {/* TOTAL AMOUNT */}
+                  <TableCell align="center">
+                    {new Date(rental.start_date).toLocaleDateString()}
+                  </TableCell>
+
+                  <TableCell align="center">
+                    {new Date(rental.end_date).toLocaleDateString()}
+                  </TableCell>
+
                   <TableCell align="center" className="font-semibold">
                     ₹{rental.amount_paid}
                   </TableCell>
