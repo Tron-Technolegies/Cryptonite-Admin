@@ -79,6 +79,9 @@ export default function ProductTable() {
                 <b>Algorithm</b>
               </TableCell>
               <TableCell align="center">
+                <b>Available</b>
+              </TableCell>
+              <TableCell align="center">
                 <b>Actions</b>
               </TableCell>
             </TableRow>
@@ -108,6 +111,7 @@ export default function ProductTable() {
                   <TableCell align="center">{product.hashrate}</TableCell>
                   <TableCell align="center">{product.power}</TableCell>
                   <TableCell align="center">{product.algorithm}</TableCell>
+                  <TableCell align="center">{product.is_available ? "Yes" : "No"}</TableCell>
                   <TableCell align="center">
                     <div className="flex justify-center gap-3">
                       <FiEdit2

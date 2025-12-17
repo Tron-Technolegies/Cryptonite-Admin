@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import ProductTable from "../../components/product/ProductTable";
+import { IoAddCircleOutline } from "react-icons/io5";
 
 export default function Product() {
   const navigate = useNavigate();
@@ -14,9 +15,10 @@ export default function Product() {
 
           <button
             onClick={() => navigate("/products-add")}
-            className="text-white px-6 py-2 rounded-lg font-medium transition"
+            className="text-white px-6 flex items-center gap-2 py-2 rounded-lg font-medium transition"
             style={{ backgroundColor: "var(--primary-color)" }}
           >
+            <IoAddCircleOutline />
             Add New Product
           </button>
         </div>

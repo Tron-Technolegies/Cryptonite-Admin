@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import cryptonitelogo from "/cryptonitelogo.png";
 
 const Sidebar = ({ open, setOpen }) => {
   const base = "flex items-center px-4 py-3 rounded-lg transition-all";
@@ -13,15 +14,17 @@ const Sidebar = ({ open, setOpen }) => {
 
       <aside
         className={`fixed md:static top-0 left-0 min-h-screen w-56 bg-black text-white transform
-  ${open ? "translate-x-0" : "-translate-x-full"}
-  md:translate-x-0
-  z-50 md:z-auto
-  transition-transform`}
+          ${open ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0
+          z-50 md:z-auto
+          transition-transform`}
       >
-        <div className="px-5 py-6 border-b border-gray-800">
-          <h2 className="text-xl font-bold">Admin Panel</h2>
+        {/* LOGO */}
+        <div className="py-8 items-center border-b border-gray-800  flex justify-center">
+          <img src={cryptonitelogo} alt="Cryptonite Logo" className="h-12 object-contain" />
         </div>
 
+        {/* NAV */}
         <nav className="px-3 py-6 space-y-2">
           {[
             { to: "/", label: "Dashboard", end: true },
