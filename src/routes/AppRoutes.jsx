@@ -16,6 +16,7 @@ import HostingRequests from "../pages/hosting/HostingRequests";
 import OrderPage from "../pages/orders/OrderPage";
 import BundleForm from "../pages/bundles/BundleForm";
 import EditProduct from "../pages/products/EditProducts";
+import BulkUploadProducts from "../pages/products/BulkUploadProducts";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
       { path: "products", element: <Product /> },
       { path: "products-add", element: <AddProduct /> },
       { path: "products-edit/:id", element: <EditProduct /> },
+      { path: "/products-bulk-upload", element: <BulkUploadProducts /> },
       { path: "users", element: <Users /> },
       { path: "bundles", element: <BundlePage /> },
       { path: "bundles/add", element: <BundleForm /> },

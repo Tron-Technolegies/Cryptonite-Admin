@@ -15,11 +15,14 @@ import Paper from "@mui/material/Paper";
 
 // Icons
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import ConfirmModal from "../ConfirmModal";
 
 export default function ProductTable() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [page, setPage] = useState(1);
   const itemsPerPage = 5;
@@ -41,15 +44,17 @@ export default function ProductTable() {
     fetchProducts();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this product?")) return;
-
+  const confirmDelete = async () => {
     try {
-      await api.delete(`products/${id}/delete/`);
+      setDeleting(true);
+      await api.delete(`products/${deleteId}/delete/`);
       toast.success("Product deleted");
+      setDeleteId(null);
       fetchProducts();
     } catch {
       toast.error("Failed to delete product");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -120,7 +125,7 @@ export default function ProductTable() {
                       />
                       <FiTrash2
                         className="cursor-pointer hover:text-red-500"
-                        onClick={() => handleDelete(product.id)}
+                        onClick={() => setDeleteId(product.id)}
                       />
                     </div>
                   </TableCell>
@@ -130,6 +135,16 @@ export default function ProductTable() {
           </TableBody>
         </Table>
       </TableContainer>
+      {deleteId && (
+        <ConfirmModal
+          title="Delete Product"
+          message="This product will be permanently removed. This action cannot be undone."
+          confirmText="Delete"
+          loading={deleting}
+          onCancel={() => setDeleteId(null)}
+          onConfirm={confirmDelete}
+        />
+      )}
 
       {/* PAGINATION */}
       <div className="flex justify-center gap-4 mt-4">

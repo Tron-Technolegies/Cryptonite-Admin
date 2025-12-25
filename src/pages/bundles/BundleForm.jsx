@@ -13,7 +13,7 @@ const BundleForm = () => {
     name: "",
     price: "",
     description: "",
-    products: [],
+    products: [], // [{ product_id, quantity }]
     hosting_fee_per_kw: "",
     total_hashrate: "",
     total_power: "",
@@ -23,25 +23,37 @@ const BundleForm = () => {
   const [allProducts, setAllProducts] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
 
-  // ===== FETCH PRODUCTS =====
+  /* ================= FETCH PRODUCTS ================= */
   useEffect(() => {
     api.get("products/").then((res) => setAllProducts(res.data));
   }, []);
 
-  // ===== FETCH BUNDLE (EDIT) =====
+  /* ================= FETCH BUNDLE (EDIT MODE) ================= */
   useEffect(() => {
     if (!id) return;
+
     api.get(`bundles/${id}/`).then((res) => {
       setFormData({
-        ...res.data,
-        products: res.data.products,
-        image: null,
+        name: res.data.name || "",
+        price: res.data.price || "",
+        description: res.data.description || "",
+        hosting_fee_per_kw: res.data.hosting_fee_per_kw || "",
+        total_hashrate: res.data.total_hashrate || "",
+        total_power: res.data.total_power || "",
+
+        products: res.data.items.map((item) => ({
+          product_id: item.product_id,
+          quantity: item.quantity ?? "",
+        })),
+
+        image: null, // only change if user uploads new image
       });
+
       setImagePreview(res.data.image);
     });
   }, [id]);
 
-  // ===== INPUT CHANGE =====
+  /* ================= INPUT CHANGE ================= */
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
@@ -53,28 +65,53 @@ const BundleForm = () => {
     }
   };
 
-  // ===== PRODUCT ADD / REMOVE =====
-  const addProduct = (id) => {
-    if (!formData.products.includes(id)) {
-      setFormData((p) => ({ ...p, products: [...p.products, id] }));
-    }
+  /* ================= PRODUCT ADD ================= */
+  const addProduct = (productId) => {
+    setFormData((p) => {
+      const exists = p.products.find((x) => x.product_id === productId);
+      if (exists) return p;
+
+      return {
+        ...p,
+        products: [...p.products, { product_id: productId, quantity: "" }],
+      };
+    });
   };
 
-  const removeProduct = (id) => {
+  /* ================= QUANTITY UPDATE ================= */
+  const updateQuantity = (productId, value) => {
+    const qty = Number(value);
+
     setFormData((p) => ({
       ...p,
-      products: p.products.filter((pid) => pid !== id),
+      products: p.products.map((x) =>
+        x.product_id === productId ? { ...x, quantity: qty >= 1 ? qty : 1 } : x
+      ),
     }));
   };
 
-  // ===== SUBMIT =====
+  /* ================= REMOVE PRODUCT ================= */
+  const removeProduct = (productId) => {
+    setFormData((p) => ({
+      ...p,
+      products: p.products.filter((x) => x.product_id !== productId),
+    }));
+  };
+
+  /* ================= SUBMIT ================= */
   const handleSubmit = async () => {
     const data = new FormData();
 
-    Object.entries(formData).forEach(([key, val]) => {
-      if (Array.isArray(val)) val.forEach((v) => data.append(key, v));
-      else if (val !== null && val !== "") data.append(key, val);
-    });
+    data.append("name", formData.name);
+    data.append("price", formData.price);
+    data.append("description", formData.description);
+    data.append("hosting_fee_per_kw", formData.hosting_fee_per_kw);
+    data.append("total_hashrate", formData.total_hashrate);
+    data.append("total_power", formData.total_power);
+
+    data.append("items", JSON.stringify(formData.products));
+
+    if (formData.image) data.append("image", formData.image);
 
     try {
       if (isEdit) {
@@ -147,40 +184,75 @@ const BundleForm = () => {
             <div>
               <h3 className="font-semibold mb-2">Available Products</h3>
               <div className="border rounded-lg divide-y max-h-64 overflow-y-auto">
-                {allProducts.map((p) => (
-                  <div key={p.id} className="flex justify-between items-center p-3">
-                    <span>{p.model_name}</span>
-                    <button
-                      onClick={() => addProduct(p.id)}
-                      className="text-green-600 hover:bg-green-50 p-1 rounded"
-                    >
-                      <FiPlus />
-                    </button>
-                  </div>
-                ))}
+                {allProducts.map((p) => {
+                  const alreadyAdded = formData.products.some((x) => x.product_id === p.id);
+
+                  return (
+                    <div key={p.id} className="flex justify-between items-center p-3">
+                      <span>{p.model_name}</span>
+                      <button
+                        disabled={alreadyAdded}
+                        onClick={() => addProduct(p.id)}
+                        className={`p-1 rounded ${
+                          alreadyAdded
+                            ? "text-gray-400 cursor-not-allowed"
+                            : "text-green-600 hover:bg-green-50"
+                        }`}
+                      >
+                        <FiPlus />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
             {/* SELECTED */}
             <div>
               <h3 className="font-semibold mb-2">Selected Products</h3>
-              <div className="border rounded-lg p-3 flex flex-wrap gap-2 min-h-[80px]">
+              <div className="border rounded-lg p-3 flex flex-col gap-3 min-h-[80px]">
                 {formData.products.length === 0 && (
                   <p className="text-sm text-gray-400">No products selected</p>
                 )}
-                {formData.products.map((pid) => {
-                  const prod = allProducts.find((p) => p.id === pid);
+
+                {formData.products.map(({ product_id, quantity }) => {
+                  const prod = allProducts.find((p) => p.id === product_id);
+
                   return (
-                    <span
-                      key={pid}
-                      className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full text-sm"
-                    >
-                      {prod?.model_name}
+                    <div key={product_id} className="flex items-center gap-3">
+                      <span className="font-medium">{prod?.model_name}</span>
+
+                      <input
+                        type="number"
+                        min={1}
+                        placeholder="Qty"
+                        value={quantity}
+                        onChange={(e) =>
+                          setFormData((p) => ({
+                            ...p,
+                            products: p.products.map((x) =>
+                              x.product_id === product_id ? { ...x, quantity: e.target.value } : x
+                            ),
+                          }))
+                        }
+                        onBlur={() => {
+                          setFormData((p) => ({
+                            ...p,
+                            products: p.products.map((x) =>
+                              x.product_id === product_id
+                                ? { ...x, quantity: x.quantity === "" ? 1 : Number(x.quantity) }
+                                : x
+                            ),
+                          }));
+                        }}
+                        className="w-20 border rounded p-1 text-center"
+                      />
+
                       <FiX
                         className="cursor-pointer text-red-500"
-                        onClick={() => removeProduct(pid)}
+                        onClick={() => removeProduct(product_id)}
                       />
-                    </span>
+                    </div>
                   );
                 })}
               </div>
@@ -219,7 +291,7 @@ const BundleForm = () => {
   );
 };
 
-/* ===== REUSABLE INPUTS ===== */
+/* ================= REUSABLE INPUTS ================= */
 const Input = ({ label, ...props }) => (
   <div className="space-y-2">
     <label className="text-sm font-medium text-gray-700">{label}</label>
