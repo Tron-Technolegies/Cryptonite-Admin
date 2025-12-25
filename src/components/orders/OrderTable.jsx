@@ -97,7 +97,20 @@ export default function OrderTable() {
 
                   <TableCell align="center">{order.user_email}</TableCell>
 
-                  <TableCell align="center">{order.items?.length || 0}</TableCell>
+                  <TableCell align="center">
+                    {order.items && order.items.length > 0 ? (
+                      <div className="flex flex-col gap-1">
+                        {order.items.map((item) => (
+                          <div key={item.id} className="text-sm">
+                            <span className="font-medium">{item.product_name}</span>
+                            <span className="text-gray-500"> × {item.quantity}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">No items</span>
+                    )}
+                  </TableCell>
 
                   <TableCell align="center" className="font-semibold">
                     {order.total_amount}

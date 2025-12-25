@@ -15,11 +15,14 @@ import Paper from "@mui/material/Paper";
 
 // Icons
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import ConfirmModal from "../ConfirmModal";
 
 export default function BundleTable() {
   const [bundles, setBundles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const itemsPerPage = 5;
   const navigate = useNavigate();
@@ -43,18 +46,25 @@ export default function BundleTable() {
   }, []);
 
   // ===== DELETE =====
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this bundle?")) return;
+  const confirmDelete = async () => {
     try {
-      await api.delete(`bundles/${id}/delete/`);
+      setDeleting(true);
+      await api.delete(`bundles/${deleteId}/delete/`);
       toast.success("Bundle deleted");
+      setDeleteId(null);
       fetchBundles();
     } catch {
       toast.error("Failed to delete bundle");
+    } finally {
+      setDeleting(false);
     }
   };
 
-  const paginated = bundles.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  const sortedBundles = [...bundles].sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
+
+  const paginated = sortedBundles.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
   if (isLoading) return <Loading />;
 
@@ -115,7 +125,20 @@ export default function BundleTable() {
 
                   <TableCell align="center">₹{bundle.price}</TableCell>
 
-                  <TableCell align="center">{bundle.products?.length || 0}</TableCell>
+                  <TableCell align="left">
+                    {bundle.items?.length ? (
+                      <div className="flex flex-col text-sm gap-1">
+                        {bundle.items.map((item) => (
+                          <div key={item.product_id}>
+                            <span className="font-medium">{item.product_name}</span>
+                            <span className="text-gray-500"> × {item.quantity}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      "—"
+                    )}
+                  </TableCell>
 
                   <TableCell align="center">{bundle.hosting_fee_per_kw}</TableCell>
                   <TableCell align="center">{bundle.total_hashrate}</TableCell>
@@ -131,7 +154,7 @@ export default function BundleTable() {
                       <FiTrash2
                         size={18}
                         className="cursor-pointer hover:text-red-600"
-                        onClick={() => handleDelete(bundle.id)}
+                        onClick={() => setDeleteId(bundle.id)}
                       />
                     </div>
                   </TableCell>
@@ -141,6 +164,16 @@ export default function BundleTable() {
           </TableBody>
         </Table>
       </TableContainer>
+      {deleteId && (
+        <ConfirmModal
+          title="Delete Bundle"
+          message="This bundle and all its product mappings will be permanently deleted. This action cannot be undone."
+          confirmText="Delete"
+          loading={deleting}
+          onCancel={() => setDeleteId(null)}
+          onConfirm={confirmDelete}
+        />
+      )}
 
       {/* PAGINATION */}
       <div className="flex justify-center gap-4 mt-4">
