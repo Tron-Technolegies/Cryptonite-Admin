@@ -1,9 +1,9 @@
-import { FiAlertTriangle } from "react-icons/fi";
+import { FiCheckCircle, FiX } from "react-icons/fi";
 
 export default function ConfirmModal({
   title = "Confirm Action",
-  message = "Are you sure?",
-  confirmText = "Delete",
+  message = "Are you sure you want to continue?",
+  confirmText = "Confirm",
   cancelText = "Cancel",
   loading = false,
   onConfirm,
@@ -14,7 +14,7 @@ export default function ConfirmModal({
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 animate-fade-in">
         {/* HEADER */}
         <div className="flex items-center gap-3 mb-4">
-          <FiAlertTriangle className="text-red-500" size={22} />
+          <FiCheckCircle className="text-green-600" size={22} />
           <h3 className="text-lg font-semibold">{title}</h3>
         </div>
 
@@ -34,9 +34,9 @@ export default function ConfirmModal({
           <button
             onClick={onConfirm}
             disabled={loading}
-            className="px-5 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
+            className="px-5 py-2 rounded-lg text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
           >
-            {loading ? "Deleting..." : confirmText}
+            {loading ? "Processing..." : confirmText}
           </button>
         </div>
       </div>
