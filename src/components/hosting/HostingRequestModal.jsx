@@ -7,7 +7,6 @@ import ConfirmModal from "../../components/ConfirmModal";
 export default function HostingRequestModal({ id, onClose, onUpdated }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [monitoringType, setMonitoringType] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -45,8 +44,7 @@ export default function HostingRequestModal({ id, onClose, onUpdated }) {
       await api.post(`hosting-requests/${id}/activate-monitoring/`, {
         monitoring_type: monitoringType,
       });
-
-      toast.success("Monitoring activated successfully");
+      toast.success("Monitoring activated");
       setConfirmOpen(false);
       fetchDetail();
       onUpdated();
@@ -59,10 +57,12 @@ export default function HostingRequestModal({ id, onClose, onUpdated }) {
 
   if (!data) return null;
 
+  const formatUSD = (value) => `$${Number(value || 0).toLocaleString()}`;
+
   return (
     <>
       <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-        <div className="bg-white w-full max-w-2xl rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white w-full max-w-3xl rounded-xl shadow-lg overflow-hidden">
           {/* HEADER */}
           <div className="flex justify-between items-center px-6 py-4 border-b">
             <h3 className="text-xl font-bold">Hosting Request #{data.id}</h3>
@@ -72,17 +72,20 @@ export default function HostingRequestModal({ id, onClose, onUpdated }) {
           </div>
 
           {/* BODY */}
-          <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+          <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
             {/* BASIC INFO */}
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm bg-gray-50 p-4 rounded-lg">
               <div>
-                <b>User:</b> #{data.user}
+                <b>User ID:</b> {data.user}
+              </div>
+              <div>
+                <b>Email:</b> {data.user_email}
               </div>
               <div>
                 <b>Phone:</b> {data.phone}
               </div>
               <div>
-                <b>Location:</b> {data.hosting_location}
+                <b>Location:</b> {data.hosting_location_display}
               </div>
               <div>
                 <b>Payment:</b>{" "}
@@ -90,45 +93,40 @@ export default function HostingRequestModal({ id, onClose, onUpdated }) {
                   {data.is_paid ? "Paid" : "Pending"}
                 </span>
               </div>
+              <div>
+                <b>Created:</b> {new Date(data.created_at).toLocaleString()}
+              </div>
             </div>
 
             {/* PRODUCTS */}
             <div>
               <p className="font-semibold mb-2">Products</p>
-              {data.items.map((item) => (
-                <div key={item.id} className="text-sm">
-                  {item.title} × {item.quantity}
-                </div>
-              ))}
+              <div className="border rounded-lg divide-y">
+                {data.items.map((item) => (
+                  <div key={item.id} className="flex justify-between p-3 text-sm">
+                    <div>
+                      <p className="font-medium">{item.title}</p>
+                      <p className="text-gray-500">Qty: {item.quantity}</p>
+                    </div>
+                    <div className="font-medium">{formatUSD(item.total_price)}</div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* BILLING */}
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
               <div>
-                <label className="text-sm font-medium">Monthly Fee</label>
-                <input
-                  type="number"
-                  value={data.monthly_fee || ""}
-                  onChange={(e) => setData({ ...data, monthly_fee: e.target.value })}
-                  className="mt-1 w-full border rounded-lg p-2"
-                />
+                <p className="text-sm text-gray-500">Setup Fee</p>
+                <p className="font-semibold">{formatUSD(data.setup_fee)}</p>
               </div>
-
               <div>
-                <label className="text-sm font-medium">Status</label>
-                <select
-                  value={data.status}
-                  onChange={(e) => setData({ ...data, status: e.target.value })}
-                  className="mt-1 w-full border rounded-lg p-2"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                </select>
+                <p className="text-sm text-gray-500">Total Amount</p>
+                <p className="font-semibold">{formatUSD(data.total_amount)}</p>
               </div>
             </div>
 
-            {/* NOTES */}
+            {/* ADMIN NOTES */}
             <div>
               <label className="text-sm font-medium">Admin Notes</label>
               <textarea
@@ -139,18 +137,16 @@ export default function HostingRequestModal({ id, onClose, onUpdated }) {
               />
             </div>
 
-            {/* ACTIVATE SECTION */}
-            <div className="border-t pt-4 space-y-3">
-              <p className="font-semibold">Monitoring Activation</p>
+            {/* MONITORING */}
+            <div className="border-t pt-4">
+              <p className="font-semibold mb-2">Monitoring</p>
 
               {data.monitoring_activated ? (
-                <div className="border border-green-300 bg-green-50 rounded-lg p-4 flex items-center gap-3">
-                  <FiCheckCircle className="text-green-600 text-xl" />
+                <div className="flex items-center gap-3 bg-green-50 border border-green-300 p-3 rounded-lg">
+                  <FiCheckCircle className="text-green-600" />
                   <div>
-                    <p className="font-semibold text-green-700">Monitoring Activated</p>
-                    <p className="text-sm text-green-600 capitalize">
-                      Type: {data.monitoring_type}
-                    </p>
+                    <p className="font-semibold text-green-700">Activated</p>
+                    <p className="text-sm">Type: {data.monitoring_type}</p>
                   </div>
                 </div>
               ) : (
@@ -160,17 +156,16 @@ export default function HostingRequestModal({ id, onClose, onUpdated }) {
                       setMonitoringType("internal");
                       setConfirmOpen(true);
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg"
                   >
                     Activate Internal
                   </button>
-
                   <button
                     onClick={() => {
                       setMonitoringType("external");
                       setConfirmOpen(true);
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg"
                   >
                     Activate External
                   </button>
@@ -195,11 +190,10 @@ export default function HostingRequestModal({ id, onClose, onUpdated }) {
         </div>
       </div>
 
-      {/* CONFIRM MODAL */}
       {confirmOpen && (
         <ConfirmModal
           title="Activate Monitoring"
-          message={`Are you sure you want to activate ${monitoringType} monitoring for this user?`}
+          message={`Are you sure you want to activate ${monitoringType} monitoring?`}
           confirmText="Activate"
           onCancel={() => setConfirmOpen(false)}
           onConfirm={handleActivate}

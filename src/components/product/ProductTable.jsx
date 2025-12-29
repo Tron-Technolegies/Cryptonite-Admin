@@ -112,7 +112,7 @@ export default function ProductTable() {
                       <p className="font-medium">{product.model_name}</p>
                     </div>
                   </TableCell>
-                  <TableCell align="center">{product.price || "-"}</TableCell>
+                  <TableCell align="center">$ {product.price || "-"}</TableCell>
                   <TableCell align="center">{product.hashrate}</TableCell>
                   <TableCell align="center">{product.power}</TableCell>
                   <TableCell align="center">{product.algorithm}</TableCell>

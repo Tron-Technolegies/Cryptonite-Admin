@@ -123,7 +123,7 @@ export default function BundleTable() {
                     </div>
                   </TableCell>
 
-                  <TableCell align="center">₹{bundle.price}</TableCell>
+                  <TableCell align="center">${bundle.price}</TableCell>
 
                   <TableCell align="left">
                     {bundle.items?.length ? (

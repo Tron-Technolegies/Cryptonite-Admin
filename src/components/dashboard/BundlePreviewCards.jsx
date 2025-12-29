@@ -22,7 +22,7 @@ const BundlePreviewCards = () => {
         {bundles.map((b) => (
           <div
             key={b.id}
-            className="rounded-lg p-3flex gap-3 items-center border border-gray-200 hover:bg-green-50 transition"
+            className="rounded-lg p-3 flex gap-3 items-center border border-gray-200 hover:bg-green-50 transition"
           >
             <div>
               {" "}

@@ -62,7 +62,7 @@ export default function RentalTable() {
                 <b>End Date</b>
               </TableCell>
               <TableCell align="center">
-                <b>Total Amount (₹)</b>
+                <b>Total Amount ($)</b>
               </TableCell>
               <TableCell align="center">
                 <b>Status</b>
@@ -97,7 +97,7 @@ export default function RentalTable() {
                   </TableCell>
 
                   <TableCell align="center" className="font-semibold">
-                    ₹{rental.amount_paid}
+                    ${rental.amount_paid}
                   </TableCell>
 
                   <TableCell align="center">
