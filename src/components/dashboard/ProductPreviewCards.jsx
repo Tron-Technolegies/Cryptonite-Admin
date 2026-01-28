@@ -37,7 +37,7 @@ const ProductPreviewCards = () => {
             </div>
             <div className="">
               <p className="text-sm font-medium truncate">{p.model_name}</p>
-              <p className="text-xs text-gray-600">₹{p.price || "—"}</p>
+              <p className="text-xs text-gray-600">${p.price || "—"}</p>
             </div>
           </Link>
         ))}

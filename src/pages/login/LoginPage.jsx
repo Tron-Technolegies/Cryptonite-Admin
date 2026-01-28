@@ -22,7 +22,7 @@ const LoginPage = () => {
     try {
       setLoading(true);
 
-      const res = await axios.post("https://cryptonite-gbcg.onrender.com/api/user/auth/login/", {
+      const res = await axios.post("https://api.cryptonite.at/api/user/auth/login/", {
         email,
         password,
       });

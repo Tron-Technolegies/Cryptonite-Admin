@@ -97,7 +97,7 @@ export default function HostingTable() {
                 sx={{ cursor: "pointer" }}
               >
                 <TableCell>#{req.id}</TableCell>
-                <TableCell>User #{req.user}</TableCell>
+                <TableCell>{req.user_email}</TableCell>
                 <TableCell>{req.phone || "—"}</TableCell>
 
                 <TableCell>

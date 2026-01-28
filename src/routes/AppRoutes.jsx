@@ -17,6 +17,10 @@ import OrderPage from "../pages/orders/OrderPage";
 import BundleForm from "../pages/bundles/BundleForm";
 import EditProduct from "../pages/products/EditProducts";
 import BulkUploadProducts from "../pages/products/BulkUploadProducts";
+import Blogs from "../pages/blogs/Blogs";
+import BlogForm from "../components/blogs/BlogForm";
+import Events from "../pages/events/Events";
+import EventForm from "../components/events/EventForm";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +44,12 @@ const router = createBrowserRouter([
       { path: "rentals", element: <RentalPage /> },
       { path: "hosting-requests", element: <HostingRequests /> },
       { path: "orders", element: <OrderPage /> },
+      { path: "blogs", element: <Blogs /> },
+      { path: "blogs/add", element: <BlogForm /> },
+      { path: "blogs/:id/update", element: <BlogForm /> },
+      { path: "events", element: <Events /> },
+      { path: "events/add", element: <EventForm /> },
+      { path: "events/:id/update", element: <EventForm /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },

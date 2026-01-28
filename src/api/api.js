@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://cryptonite-gbcg.onrender.com/api/admin/",
+  baseURL: "https://api.cryptonite.at/api/admin/",
   withCredentials: true, // for refresh cookie
 });
 
@@ -27,7 +27,7 @@ api.interceptors.response.use(
         const refreshRes = await axios.post(
           "https://cryptonite-gbcg.onrender.com/api/admin/token/refresh/",
           {},
-          { withCredentials: true }
+          { withCredentials: true },
         );
 
         const newAccessToken = refreshRes.data.access;
@@ -42,7 +42,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(err);
-  }
+  },
 );
 
 export default api;
