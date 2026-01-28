@@ -34,6 +34,8 @@ const Sidebar = ({ open, setOpen }) => {
             { to: "/rentals", label: "Rentals" },
             { to: "/hosting-requests", label: "Hosting Requests" },
             { to: "/orders", label: "Orders" },
+            { to: "/blogs", label: "Blogs" },
+            { to: "/events", label: "Events" },
           ].map(({ to, label, end }) => (
             <NavLink
               key={to}
